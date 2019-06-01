@@ -3,18 +3,20 @@
 import sys,os
 import re
 import shutil
+import argparse
 
 BASE_DIR = "/Users/sunjingwei/Downloads"
 SUFFIX_PATTEN = re.compile(r'''^.*\.([^\.]*)$''')
 
-my_dict = {
+DICT_CONFIG = {
         "images":['.png','.jpg','.gif', '.jpeg'],
         "books":['.txt','.epub','.pdf','.mobi'],
         "videos":['.avi','.rmvb','.mp4','.mkv', '.mov'],
         "voices":['.mp3', '.wmv', '.m4a'],
-        "docs":['.doc', '.docx', '.html', '.htm', '.ppt', '.pptx','.key', '.xls', '.xlsx', '.csv'],
-        "xmind":['.xmind', '.mmap','.mindnode'],
-        "archives":['.zip', '.rar', '.exe', '.apk', '.dmg']
+        "docs":['.doc', '.docx', '.html', '.htm', '.ppt', '.pps','.pptx','.key', '.xls', '.xlsx', '.numbers','.csv', '.md'],
+        "xmind":['.xmind', '.mmap','.mindnode', '.mm'],
+        "source_code" : ['.eddx', '.ps', '.rp', '.mpp'],
+        "archives":['.zip', '.rar', '.exe', '.apk', '.dmg', '.pkg']
         }
 
 def reverse_dict(my_dict):
@@ -25,10 +27,10 @@ def reverse_dict(my_dict):
     #print("result=%s"%result)
     return result
 
-def make_dirs(my_dict):
-    if os.path.abspath(os.curdir) != BASE_DIR:
-        os.chdir(BASE_DIR)
-    assert(os.path.abspath(os.curdir) == BASE_DIR)
+def make_dirs(my_dict, base_dir):
+    if os.path.abspath(os.curdir) != base_dir:
+        os.chdir(base_dir)
+    assert(os.path.abspath(os.curdir) == base_dir)
     for i,key in enumerate(my_dict):
         print("makedir "+ key)
         os.makedirs(key, exist_ok=True)
@@ -46,9 +48,15 @@ def move_file(file_name, my_reverse_dict):
 
 
 def main():
-    my_reverse_dict = reverse_dict(my_dict)
+    parser = argparse.ArgumentParser(description="Basedir is '/Users/sunjingwei/Downloads' if not set")
+    parser.add_argument('--dir', help='set basedir')
+    result = parser.parse_args()
+    global BASE_DIR
+    if result.dir != None:
+        BASE_DIR = result.dir
+    my_reverse_dict = reverse_dict(DICT_CONFIG)
     print(my_reverse_dict)
-    make_dirs(my_dict)
+    make_dirs(DICT_CONFIG, BASE_DIR)
     os.chdir(BASE_DIR)
     if os.path.abspath(os.curdir)==BASE_DIR:
         for filename in os.listdir('.'):
